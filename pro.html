@@ -30,7 +30,7 @@
 <body>
 
     <h2>You Made it!</h2>
-    <input type="text" id="urlInput" placeholder="Start With https://" />
+    <input type="text" id="urlInput" placeholder="Start With https://" onkeypress="handleKeyPress(event)" />
     <button onclick="loadProxy()">Idk What to Call it</button>
     
     <div id="iframeContainer">
