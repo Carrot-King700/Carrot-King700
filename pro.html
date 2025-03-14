@@ -30,7 +30,7 @@
 <body>
 
     <h2>You Made it!</h2>
-    <input type="text" id="urlInput" placeholder="Start With https://" onkeypress="handleKeyPress(event)" />
+    <input type="text" id="urlInput" placeholder="Start With https://" onkeydown="handleKeyPress(event)" />
     <button onclick="loadProxy()">Idk What to Call it</button>
     
     <div id="iframeContainer">
@@ -49,12 +49,13 @@
             let proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
             document.getElementById("proxyFrame").src = proxyUrl;
         }
-
+        
         function handleKeyPress(event) {
-            if (event.key === "Enter") {
-                loadProxy();
-            }
-        }
+    if (event.key === "Enter") {
+        event.preventDefault(); // Prevents form submission or accidental reload
+        loadProxy(); // Runs the proxy function
+    }
+}
 
         function toggleFullscreen() {
             let iframe = document.getElementById("proxyFrame");
