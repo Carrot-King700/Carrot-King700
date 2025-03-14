@@ -1,9 +1,10 @@
 export async function handler(event) {
     const url = event.queryStringParameters.url;
-    
+
     if (!url) {
         return {
             statusCode: 400,
+            headers: { "Access-Control-Allow-Origin": "*" },  // ✅ Allow all domains
             body: JSON.stringify({ error: "Missing URL parameter" }),
         };
     }
@@ -17,13 +18,14 @@ export async function handler(event) {
             statusCode: 200,
             headers: {
                 "Content-Type": contentType || "text/plain",
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "*",  // ✅ Allow requests from anywhere
             },
             body: data,
         };
     } catch (error) {
         return {
             statusCode: 500,
+            headers: { "Access-Control-Allow-Origin": "*" },  // ✅ Prevent CORS errors
             body: JSON.stringify({ error: "Failed to fetch the requested URL" }),
         };
     }
