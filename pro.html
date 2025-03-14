@@ -9,8 +9,17 @@
         input { width: 300px; padding: 10px; }
         button { padding: 10px 20px; cursor: pointer; margin: 5px; }
         #iframeContainer { position: relative; display: inline-block; width: 100%; }
-        iframe { width: 100%; height: 500px; border: 1px solid #ccc; margin-top: 20px; }
-        .fullscreen-btn { position: absolute; top: 10px; right: 10px; padding: 5px 10px; background: black; color: white; border: none; cursor: pointer; }
+        iframe { width: 100%; height: 500px; border: 1px solid #ccc; margin-top: 20px; display: block; }
+        .fullscreen-btn { 
+            display: block; 
+            width: 100%; 
+            padding: 10px; 
+            background: black; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -20,8 +29,8 @@
     <button onclick="loadProxy()">Proxy It</button>
     
     <div id="iframeContainer">
-        <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
         <iframe id="proxyFrame"></iframe>
+        <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
     </div>
 
     <script>
@@ -32,7 +41,7 @@
                 return;
             }
 
-            let proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app//.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
+            let proxyUrl = `https://your-site.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
             document.getElementById("proxyFrame").src = proxyUrl;
         }
 
