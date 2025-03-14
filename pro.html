@@ -30,8 +30,8 @@
 <body>
 
     <h2>You Made it!</h2>
-    <input type="text" id="urlInput" placeholder="Enter URL to proxy" />
-    <button onclick="loadProxy()">Proxy It</button>
+    <input type="text" id="urlInput" placeholder="Start With https://" />
+    <button onclick="loadProxy()">Idk What to Call it</button>
     
     <div id="iframeContainer">
         <iframe id="proxyFrame"></iframe>
@@ -48,6 +48,12 @@
 
             let proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
             document.getElementById("proxyFrame").src = proxyUrl;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                loadProxy();
+            }
         }
 
         function toggleFullscreen() {
