@@ -46,18 +46,16 @@
 
     <script>
         function loadProxy() {
-    let url = document.getElementById("urlInput").value;
-    if (!url.startsWith("http")) {
-        alert("Please enter a valid URL starting with http:// or https://");
-        return;
-    }
+            let url = document.getElementById("urlInput").value;
+            if (!url.startsWith("http")) {
+                alert("Please enter a valid URL starting with http:// or https://");
+                return;
+            }
 
-    let proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
-    
-    // Instead of iframe, open in a new tab
-    window.open(proxyUrl, "_blank");
-}
-
+            let proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
+            document.getElementById("proxyFrame").src = proxyUrl;
+        }
+        
 
         function handleKeyPress(event) {
     if (event.key === "Enter") {
