@@ -1,31 +1,55 @@
-const fetch = (...args) => import("node-fetch").then(({ default: fetch }) => fetch(...args));
-
 export async function handler(event) {
-    const { url } = event.queryStringParameters;
-    
+    const url = event.queryStringParameters.url;
+
     if (!url) {
         return {
             statusCode: 400,
-            body: "Missing URL parameter",
+            headers: {
+                "Access-Control-Allow-Origin": "*",  // ✅ Allows requests from any website
+                "Access-Control-Allow-Methods": "GET, OPTIONS", // ✅ Allows GET requests
+                "Access-Control-Allow-Headers": "Content-Type",
+            },
+            body: JSON.stringify({ error: "Missing URL parameter" }),
+        };
+    }
+
+    // Handle preflight requests (for CORS)
+    if (event.httpMethod === "OPTIONS") {
+        return {
+            statusCode: 200,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type",
+            },
+            body: "",
         };
     }
 
     try {
         const response = await fetch(url);
         const contentType = response.headers.get("content-type");
+        const data = await response.text();
 
         return {
             statusCode: 200,
             headers: {
-                "Content-Type": contentType,
-                "Access-Control-Allow-Origin": "*",
+                "Content-Type": contentType || "text/plain",
+                "Access-Control-Allow-Origin": "*", // ✅ Fix CORS issue
+                "Access-Control-Allow-Methods": "GET, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type",
             },
-            body: await response.text(),
+            body: data,
         };
     } catch (error) {
         return {
             statusCode: 500,
-            body: "Error fetching URL",
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type",
+            },
+            body: JSON.stringify({ error: "Failed to fetch the requested URL" }),
         };
     }
 }
