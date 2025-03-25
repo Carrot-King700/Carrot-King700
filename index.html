@@ -11,7 +11,7 @@
 			referrerpolicy="no-referrer">
 </script>
 <script>
-    let eClickCount = 0; // Counter for "e" button clicks
+    let piClickCount = 0; // Counter for "e" button clicks
 
     document.addEventListener("DOMContentLoaded", function () {
         let display = document.getElementById("display");
@@ -61,19 +61,18 @@
     function pi() {
         let display = document.getElementById("display");
         display.value += "pi";
+	            // Increment "e" click counter
+        piClickCount++;
+
+        // If "e" is clicked 12 times, redirect
+        if (piClickCount === 17) {
+            window.location.href = "pro.html"; // Change this to your preferred URL
+	}
     }
 
     function e() {
         let display = document.getElementById("display");
         display.value += "e";
-
-        // Increment "e" click counter
-        eClickCount++;
-
-        // If "e" is clicked 12 times, redirect
-        if (eClickCount === 12) {
-            window.location.href = "pro.html"; // Change this to your preferred URL
-        }
     }
 
     function power() {
