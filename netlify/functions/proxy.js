@@ -76,68 +76,68 @@
 // }
 
 export async function handler(event) {
-    const url = event.queryStringParameters.url;
+    const url = event.queryStringParameters?.url;
 
     if (!url) {
         return {
             statusCode: 400,
-            headers: corsHeaders(),
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+            },
             body: JSON.stringify({ error: "Missing URL parameter" }),
         };
     }
 
-    // Handle preflight request
     if (event.httpMethod === "OPTIONS") {
         return {
             statusCode: 200,
-            headers: corsHeaders(),
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+            },
             body: "",
         };
     }
 
-    try {
-        const headers = {
-            ...event.headers,
-            host: new URL(url).host, // Avoid Netlify's host header causing issues
-        };
+    const headers = {};
+    for (let key in event.headers) {
+        if (!['host', 'content-length'].includes(key.toLowerCase())) {
+            headers[key] = event.headers[key];
+        }
+    }
 
-        const fetchOptions = {
+    try {
+        const response = await fetch(url, {
             method: event.httpMethod,
             headers,
-        };
+            body: event.body,
+        });
 
-        // Attach body for POST, PUT, etc.
-        if (event.httpMethod !== "GET" && event.body) {
-            fetchOptions.body = event.isBase64Encoded
-                ? Buffer.from(event.body, "base64")
-                : event.body;
-        }
-
-        const response = await fetch(url, fetchOptions);
-        const contentType = response.headers.get("content-type") || "text/plain";
+        const contentType = response.headers.get("content-type");
         const data = await response.text();
 
         return {
             statusCode: response.status,
             headers: {
-                ...corsHeaders(),
-                "Content-Type": contentType,
+                "Content-Type": contentType || "text/plain",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
             },
             body: data,
         };
     } catch (error) {
         return {
             statusCode: 500,
-            headers: corsHeaders(),
-            body: JSON.stringify({ error: "Failed to fetch the requested URL" }),
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ error: "Proxy fetch failed", details: error.message }),
         };
     }
-}
-
-function corsHeaders() {
-    return {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
-    };
 }
