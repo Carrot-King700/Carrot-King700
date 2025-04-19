@@ -24,6 +24,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh;
+    gap: 20px;
+    margin: 0;
   }
   
   .tab-buttons {
@@ -40,6 +43,7 @@
     text-decoration: underline;
     font-size: 30px;
     background-color: #ed6c11;
-    padding: 8;
+    padding: 8px;
     margin: 12px;
-  } 
+  }
+  
