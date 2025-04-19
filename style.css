@@ -1,10 +1,17 @@
+body {
+    border-radius: 10px;
+    background-color: #002e62;
+    margin: 13px;
+    padding: 10px;
+  }
+
 .tab-buttons {
     color: white;
     text-decoration: none;
     font-size: 30px;
     padding: 5px;
     border-radius: 5px;
-    background-color: navy;
+    background-color: #c50;
   }
   
   .tab-buttons:hover {
