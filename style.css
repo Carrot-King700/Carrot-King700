@@ -1,12 +1,8 @@
-body {
-    border-radius: 10px;
+/* body {
     background-color: #ffa261;
-    margin: 13px;
-    padding: 10px;
   }
 
 .tab-buttons {
-    align-items: center;
     color: white;
     text-decoration: none;
     font-size: 30px;
@@ -16,11 +12,38 @@ body {
   }
   
   .tab-buttons:hover {
-    align-items: center;
     color: black;
     text-decoration: underline;
     font-size: 30px;
     background-color: #ed6c11;
     padding: 8;
     margin: 12px;
+  } */ 
+  body {
+    background-color: #ffa261;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    gap: 20px;
+    margin: 0;
+    font-family: sans-serif;
   }
+  
+  .tab-buttons {
+    color: white;
+    text-decoration: none;
+    font-size: 30px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    background-color: #c50;
+    transition: all 0.3s ease;
+  }
+  
+  .tab-buttons:hover {
+    color: black;
+    text-decoration: underline;
+    background-color: #ed6c11;
+    transform: scale(1.05);
+  }
+  
