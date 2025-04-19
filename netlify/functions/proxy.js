@@ -76,73 +76,66 @@
 // }
 
 export async function handler(event) {
-    const url = event.queryStringParameters?.url;
-
+    const url = event.queryStringParameters.url;
+  
     if (!url) {
-        return {
-            statusCode: 400,
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                "Access-Control-Allow-Headers": "*",
-            },
-            body: JSON.stringify({ error: "Missing URL parameter" }),
-        };
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing URL parameter" }),
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      };
     }
-
+  
+    // Handle CORS preflight request
     if (event.httpMethod === "OPTIONS") {
-        return {
-            statusCode: 200,
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                "Access-Control-Allow-Headers": "*",
-            },
-            body: "",
-        };
+      return {
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+        body: "",
+      };
     }
-
-    const headers = {};
-    for (let key in event.headers) {
-        if (!['host', 'content-length'].includes(key.toLowerCase())) {
-            headers[key] = event.headers[key];
-        }
-    }
-
-    const fetchOptions = {
-        method: event.httpMethod,
-        headers,
-    };
-
-    // ✅ Only include body for these methods
-    if (["POST", "PUT", "PATCH"].includes(event.httpMethod)) {
-        fetchOptions.body = event.body;
-    }
-
+  
     try {
-        const response = await fetch(url, fetchOptions);
-        const contentType = response.headers.get("content-type");
-        const data = await response.text();
-
-        return {
-            statusCode: response.status,
-            headers: {
-                "Content-Type": contentType || "text/plain",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                "Access-Control-Allow-Headers": "*",
-            },
-            body: data,
-        };
-    } catch (error) {
-        return {
-            statusCode: 500,
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                "Access-Control-Allow-Headers": "*",
-            },
-            body: JSON.stringify({ error: "Proxy fetch failed", details: error.message }),
-        };
+      const response = await fetch(url, {
+        method: event.httpMethod,
+        headers: event.headers,
+        body: event.body,
+      });
+  
+      const contentType = response.headers.get("content-type") || "text/plain";
+      const responseBody = await response.text();
+  
+      return {
+        statusCode: response.status,
+        headers: {
+          "Content-Type": contentType,
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+        body: responseBody,
+      };
+    } catch (err) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          error: "Proxy fetch failed",
+          details: err.message,
+        }),
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      };
     }
-}
+  }
+  
