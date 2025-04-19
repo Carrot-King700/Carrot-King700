@@ -1,27 +1,74 @@
+// export async function handler(event) {
+//     const url = event.queryStringParameters.url;
+
+//     if (!url) {
+//         return {
+//             statusCode: 400,
+//             headers: {
+//                 "Access-Control-Allow-Origin": "*",  // ✅ Allows requests from any website
+//                 "Access-Control-Allow-Methods": "GET, OPTIONS", // ✅ Allows GET requests
+//                 "Access-Control-Allow-Headers": "Content-Type",
+//             },
+//             body: JSON.stringify({ error: "Missing URL parameter" }),
+//         };
+//     }
+
+//     // Handle preflight requests (for CORS)
+//     if (event.httpMethod === "OPTIONS") {
+//         return {
+//             statusCode: 200,
+//             headers: {
+//                 "Access-Control-Allow-Origin": "*",
+//                 "Access-Control-Allow-Methods": "GET, OPTIONS",
+//                 "Access-Control-Allow-Headers": "Content-Type",
+//             },
+//             body: "",
+//         };
+//     }
+
+//     try {
+//         const response = await fetch(url);
+//         const contentType = response.headers.get("content-type");
+//         const data = await response.text();
+
+//         return {
+//             statusCode: 200,
+//             headers: {
+//                 "Content-Type": contentType || "text/plain",
+//                 "Access-Control-Allow-Origin": "*", // ✅ Fix CORS issue
+//                 "Access-Control-Allow-Methods": "GET, OPTIONS",
+//                 "Access-Control-Allow-Headers": "Content-Type",
+//             },
+//             body: data,
+//         };
+//     } catch (error) {
+//         return {
+//             statusCode: 500,
+//             headers: {
+//                 "Access-Control-Allow-Origin": "*",
+//                 "Access-Control-Allow-Methods": "GET, OPTIONS",
+//                 "Access-Control-Allow-Headers": "Content-Type",
+//             },
+//             body: JSON.stringify({ error: "Failed to fetch the requested URL" }),
+//         };
+//     }
+// }
+
 export async function handler(event) {
     const url = event.queryStringParameters.url;
 
     if (!url) {
         return {
             statusCode: 400,
-            headers: {
-                "Access-Control-Allow-Origin": "*",  // ✅ Allows requests from any website
-                "Access-Control-Allow-Methods": "GET, OPTIONS", // ✅ Allows GET requests
-                "Access-Control-Allow-Headers": "Content-Type",
-            },
+            headers: corsHeaders(),
             body: JSON.stringify({ error: "Missing URL parameter" }),
         };
     }
 
-    // Handle preflight requests (for CORS)
     if (event.httpMethod === "OPTIONS") {
         return {
             statusCode: 200,
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type",
-            },
+            headers: corsHeaders(),
             body: "",
         };
     }
@@ -29,27 +76,58 @@ export async function handler(event) {
     try {
         const response = await fetch(url);
         const contentType = response.headers.get("content-type");
-        const data = await response.text();
+
+        // If it's not HTML, just return it as-is
+        if (!contentType.includes("text/html")) {
+            const buffer = await response.arrayBuffer();
+            return {
+                statusCode: 200,
+                headers: {
+                    ...corsHeaders(),
+                    "Content-Type": contentType,
+                },
+                body: Buffer.from(buffer).toString("base64"),
+                isBase64Encoded: true,
+            };
+        }
+
+        // Get and rewrite HTML
+        let html = await response.text();
+
+        // Base URL for relative paths
+        const baseUrl = new URL(url);
+
+        html = html.replace(/(href|src|action)=["'](.*?)["']/gi, (match, attr, link) => {
+            // Ignore absolute links (like mailto:, data:, javascript:, etc.)
+            if (/^(mailto|javascript|data):/.test(link)) return match;
+
+            // Turn relative URLs into absolute ones
+            const fullUrl = new URL(link, baseUrl).toString();
+            return `${attr}="/.netlify/functions/proxy?url=${encodeURIComponent(fullUrl)}"`;
+        });
 
         return {
             statusCode: 200,
             headers: {
-                "Content-Type": contentType || "text/plain",
-                "Access-Control-Allow-Origin": "*", // ✅ Fix CORS issue
-                "Access-Control-Allow-Methods": "GET, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type",
+                ...corsHeaders(),
+                "Content-Type": "text/html",
             },
-            body: data,
+            body: html,
         };
     } catch (error) {
         return {
             statusCode: 500,
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type",
-            },
-            body: JSON.stringify({ error: "Failed to fetch the requested URL" }),
+            headers: corsHeaders(),
+            body: JSON.stringify({ error: error.toString() }),
         };
     }
 }
+
+function corsHeaders() {
+    return {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+    };
+}
+
