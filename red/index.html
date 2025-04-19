@@ -29,11 +29,11 @@
     }
 
     function calculate() {
-		if(display === "1234") {
-		window.location.href = "pro"
-	}
         let display = document.getElementById("display");
         let expression = display.value;
+		if(expression === "1234") {
+		window.location.href = "pro"
+	}
         let result;
 
         try {
