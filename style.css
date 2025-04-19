@@ -71,14 +71,14 @@
     font-size: 30px;
     padding: 5px;
     border-radius: 5px;
-    background-color: #c50;
+    background-color: #ffcd03;
   }
   
   .tab-buttons-yellow:hover {
     color: black;
     text-decoration: underline;
     font-size: 30px;
-    background-color: #ed6c11;
+    background-color: #fcd84c;
     padding: 8px;
     margin: 12px;
   }
@@ -89,32 +89,50 @@
     font-size: 30px;
     padding: 5px;
     border-radius: 5px;
-    background-color: #c50;
+    background-color: #0c9200;
   }
   
   .tab-buttons-green:hover {
     color: black;
     text-decoration: underline;
     font-size: 30px;
-    background-color: #ed6c11;
+    background-color: #18ed05;
     padding: 8px;
     margin: 12px;
   }
 
-  .tab-buttons-blue {
+  .tab-buttons-light-blue {
     color: white;
     text-decoration: none;
     font-size: 30px;
     padding: 5px;
     border-radius: 5px;
-    background-color: #c50;
+    background-color: #42daf5;
   }
   
-  .tab-buttons-blue:hover {
+  .tab-buttons-light-blue:hover {
     color: black;
     text-decoration: underline;
     font-size: 30px;
-    background-color: #ed6c11;
+    background-color: #3ac6de;
+    padding: 8px;
+    margin: 12px;
+  }
+
+  .tab-buttons-dark-blue {
+    color: white;
+    text-decoration: none;
+    font-size: 30px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #001dc0;
+  }
+  
+  .tab-buttons-dark-blue:hover {
+    color: black;
+    text-decoration: underline;
+    font-size: 30px;
+    background-color: #1437ff;
     padding: 8px;
     margin: 12px;
   }
@@ -125,14 +143,14 @@
     font-size: 30px;
     padding: 5px;
     border-radius: 5px;
-    background-color: #c50;
+    background-color: #3800b9;
   }
   
   .tab-buttons-purple:hover {
     color: black;
     text-decoration: underline;
     font-size: 30px;
-    background-color: #ed6c11;
+    background-color: #4500e6;
     padding: 8px;
     margin: 12px;
   }
