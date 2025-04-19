@@ -28,7 +28,25 @@
     gap: 20px;
     margin: 0;
   }
+
+  .tab-buttons-red {
+    color: white;
+    text-decoration: none;
+    font-size: 30px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #a30a0a;
+  }
   
+  .tab-buttons-red:hover {
+    color: black;
+    text-decoration: underline;
+    font-size: 30px;
+    background-color: #ff0000;
+    padding: 8px;
+    margin: 12px;
+  }
+
   .tab-buttons-orange {
     color: white;
     text-decoration: none;
@@ -47,20 +65,74 @@
     margin: 12px;
   }
 
-  .tab-buttons-red {
+  .tab-buttons-yellow {
     color: white;
     text-decoration: none;
     font-size: 30px;
     padding: 5px;
     border-radius: 5px;
-    background-color: #a30a0a;
+    background-color: #c50;
   }
   
-  .tab-buttons-red:hover {
+  .tab-buttons-yellow:hover {
     color: black;
     text-decoration: underline;
     font-size: 30px;
-    background-color: #ff0000;
+    background-color: #ed6c11;
+    padding: 8px;
+    margin: 12px;
+  }
+
+  .tab-buttons-green {
+    color: white;
+    text-decoration: none;
+    font-size: 30px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #c50;
+  }
+  
+  .tab-buttons-green:hover {
+    color: black;
+    text-decoration: underline;
+    font-size: 30px;
+    background-color: #ed6c11;
+    padding: 8px;
+    margin: 12px;
+  }
+
+  .tab-buttons-blue {
+    color: white;
+    text-decoration: none;
+    font-size: 30px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #c50;
+  }
+  
+  .tab-buttons-blue:hover {
+    color: black;
+    text-decoration: underline;
+    font-size: 30px;
+    background-color: #ed6c11;
+    padding: 8px;
+    margin: 12px;
+  }
+
+  .tab-buttons-purple {
+    color: white;
+    text-decoration: none;
+    font-size: 30px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #c50;
+  }
+  
+  .tab-buttons-purple:hover {
+    color: black;
+    text-decoration: underline;
+    font-size: 30px;
+    background-color: #ed6c11;
     padding: 8px;
     margin: 12px;
   }
