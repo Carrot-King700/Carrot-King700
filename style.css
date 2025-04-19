@@ -72,15 +72,7 @@
     background-color: #ff0000;
     padding: 8px;
     margin: 12px;
-    body {
-        background-color: #ff5050;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        gap: 20px;
-        margin: 0;
-      }
+    background-color: #ff5050;
       
   }
   
