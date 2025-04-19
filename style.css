@@ -1,0 +1,17 @@
+.tab-buttons {
+    color: white;
+    text-decoration: none;
+    font-size: 30px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: navy;
+  }
+  
+  .tab-buttons:hover {
+    color: black;
+    text-decoration: underline;
+    font-size: 30px;
+    background-color: #1752b9;
+    padding: 8;
+    margin: 12px;
+  }
