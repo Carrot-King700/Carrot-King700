@@ -6,6 +6,7 @@ body {
   }
 
 .tab-buttons {
+    align-items: center;
     color: white;
     text-decoration: none;
     font-size: 30px;
@@ -15,6 +16,7 @@ body {
   }
   
   .tab-buttons:hover {
+    align-items: center;
     color: black;
     text-decoration: underline;
     font-size: 30px;
