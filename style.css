@@ -53,14 +53,14 @@
     font-size: 30px;
     padding: 5px;
     border-radius: 5px;
-    background-color: #c50;
+    background-color: #a30a0a;
   }
   
   .tab-buttons-red:hover {
     color: black;
     text-decoration: underline;
     font-size: 30px;
-    background-color: #ed6c11;
+    background-color: #ff0000;
     padding: 8px;
     margin: 12px;
   }
