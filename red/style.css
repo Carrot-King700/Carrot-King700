@@ -48,7 +48,7 @@ input[type="text"] {
 	font-size: 24px;
 	font-weight: bold;
 	border: none;
-	border-radius: 5px;
+	border-radius: 25px;
 	border: 2px solid #a30a0a;
 	text-align: left;
 }
