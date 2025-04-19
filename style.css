@@ -46,4 +46,22 @@
     padding: 8px;
     margin: 12px;
   }
+
+  .tab-buttons-red {
+    color: white;
+    text-decoration: none;
+    font-size: 30px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #c50;
+  }
+  
+  .tab-buttons-red:hover {
+    color: black;
+    text-decoration: underline;
+    font-size: 30px;
+    background-color: #ed6c11;
+    padding: 8px;
+    margin: 12px;
+  }
   
