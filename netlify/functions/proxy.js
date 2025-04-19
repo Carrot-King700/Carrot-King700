@@ -109,13 +109,18 @@ export async function handler(event) {
         }
     }
 
-    try {
-        const response = await fetch(url, {
-            method: event.httpMethod,
-            headers,
-            body: event.body,
-        });
+    const fetchOptions = {
+        method: event.httpMethod,
+        headers,
+    };
 
+    // ✅ Only include body for these methods
+    if (["POST", "PUT", "PATCH"].includes(event.httpMethod)) {
+        fetchOptions.body = event.body;
+    }
+
+    try {
+        const response = await fetch(url, fetchOptions);
         const contentType = response.headers.get("content-type");
         const data = await response.text();
 
