@@ -54,9 +54,9 @@ input[type="text"] {
 
 #urlInput {
 	padding: 20px 240px;
-	font-size: 24px;
+	font-size: 12px;
 	font-weight: bold;
-	border-radius: 50px;
+	border-radius: 25px;
 	border: 2px solid #a30a0a;
 	text-align: left;
 }
