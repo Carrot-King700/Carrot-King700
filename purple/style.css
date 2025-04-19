@@ -1,0 +1,67 @@
+body { font-family: Arial, sans-serif; text-align: center; margin: 50px;}
+input { width: 300px; padding: 10px; border-radius: 25px; border-style: solid; border-color: #3800b9;}
+button { padding: 10px 20px; cursor: pointer; margin: 5px; border-radius: 25px; border-style: solid; border-color: #3800b9;}
+#iframeContainer { position: relative; display: inline-block; width: 100%; }
+iframe { width: 100%; height: 500px; border: 1px solid #ccc; margin-top: 20px; display: block; }
+h1 {
+ color: #3800b9;
+ text-align: center;
+ font-size: xx-large;
+}
+h2 {
+ color: #3800b9;
+ text-align: center;
+ font-size: medium;
+}
+.fullscreen-btn { 
+ display: block; 
+ width: 100%; 
+ padding: 10px; 
+ background: #3800b9; 
+ color: white; 
+ border: none; 
+ cursor: pointer; 
+ margin-top: 5px;
+ border-radius: 25px;
+ text-align: center;
+ }
+
+table {
+	border: 1px solid black;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+input[type="button"] {
+	width: 100%;
+	padding: 20px 40px;
+	background-color: #3800b9;
+	color: white;
+	font-size: 24px;
+	font-weight: bold;
+	border: none;
+	border-radius: 5px;
+}
+
+input[type="text"] {
+	padding: 20px 240px;
+	font-size: 24px;
+	font-weight: bold;
+	border-radius: 25px;
+	border: 2px solid #3800b9;
+	text-align: left;
+}
+
+#urlInput {
+	padding: 20px 240px;
+	font-size: 12px;
+	font-weight: bold;
+	border-radius: 25px;
+	border: 2px solid #3800b9;
+	text-align: left;
+}
+
+
+display {
+	text-align: left;
+}

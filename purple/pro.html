@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+</head>
+<body>
+
+    <h1>You Made it!</h1>
+    <h2>Some Things Just Don't Work</h2>
+    <input type="text" id="urlInput" placeholder="Start With https://" onkeydown="handleKeyPress(event)" />
+    <button onclick="loadProxy()">Idk what to call it but just press enter</button>
+    
+    <div id="iframeContainer">
+        <iframe id="proxyFrame"></iframe>
+        <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    </div>
+    <h2>Made by: you might know me but if not then you dont need to know</h2>
+
+    <script>
+        function loadProxy() {
+            let url = document.getElementById("urlInput").value;
+            if (!url.startsWith("http")) {
+                alert("Please enter a valid URL starting with http:// or https://");
+                return;
+            }
+
+            let proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
+            document.getElementById("proxyFrame").src = proxyUrl;
+        }
+        
+
+        function handleKeyPress(event) {
+    if (event.key === "Enter") {
+        event.preventDefault(); // Prevents form submission or accidental reload
+        loadProxy(); // Runs the proxy function
+    }
+}
+
+        function toggleFullscreen() {
+            let iframe = document.getElementById("proxyFrame");
+            if (iframe.requestFullscreen) {
+                iframe.requestFullscreen();
+            } else if (iframe.mozRequestFullScreen) { // Firefox
+                iframe.mozRequestFullScreen();
+            } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari, and Opera
+                iframe.webkitRequestFullscreen();
+            } else if (iframe.msRequestFullscreen) { // IE/Edge
+                iframe.msRequestFullscreen();
+            }
+        }
+    </script>
+
+</body>
+</html>
