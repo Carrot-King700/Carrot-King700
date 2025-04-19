@@ -52,7 +52,7 @@ input[type="text"] {
 	text-align: left;
 }
 
-input[type="text"].urlInput {
+#urlInput {
 	padding: 20px 240px;
 	font-size: 24px;
 	font-weight: bold;
@@ -60,6 +60,7 @@ input[type="text"].urlInput {
 	border: 2px solid #a30a0a;
 	text-align: left;
 }
+
 
 display {
 	text-align: left;
