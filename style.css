@@ -29,7 +29,7 @@
     margin: 0;
   }
   
-  .tab-buttons {
+  .tab-buttons-orange {
     color: white;
     text-decoration: none;
     font-size: 30px;
@@ -38,22 +38,13 @@
     background-color: #c50;
   }
   
-  .tab-buttons:hover {
+  .tab-buttons-orange:hover {
     color: black;
     text-decoration: underline;
     font-size: 30px;
     background-color: #ed6c11;
     padding: 8px;
     margin: 12px;
-    body {
-        background-color: #ffa261;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        gap: 20px;
-        margin: 0;
-      }
   }
 
   .tab-buttons-red {
@@ -72,7 +63,5 @@
     background-color: #ff0000;
     padding: 8px;
     margin: 12px;
-    background-color: #ff5050;
-      
   }
   
