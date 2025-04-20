@@ -76,14 +76,26 @@
 // }
 
 export async function handler(event) {
-    const url = event.queryStringParameters.url;
+    const urlParam = event.queryStringParameters.url;
+    const originalQuery = event.rawUrl.split('?')[1] || '';
 
-    if (!url) {
-        return {
-            statusCode: 400,
-            headers: corsHeaders(),
-            body: JSON.stringify({ error: "Missing URL parameter" }),
-        };
+    // If no full URL is given, try to rebuild from query string
+    let targetUrl;
+    if (urlParam) {
+        targetUrl = urlParam;
+    } else {
+        // Try rebuilding it
+        const referer = event.headers.referer || '';
+        const refUrl = new URL(referer);
+        const base = decodeURIComponent(refUrl.searchParams.get("url") || "");
+        if (!base) {
+            return {
+                statusCode: 400,
+                headers: corsHeaders(),
+                body: JSON.stringify({ error: "Missing URL parameter" }),
+            };
+        }
+        targetUrl = base.includes('?') ? `${base}&${originalQuery}` : `${base}?${originalQuery}`;
     }
 
     if (event.httpMethod === "OPTIONS") {
@@ -95,24 +107,16 @@ export async function handler(event) {
     }
 
     try {
-        let response;
-        
-        if (event.httpMethod === "GET") {
-            response = await fetch(url);
-        } else if (event.httpMethod === "POST") {
-            // Handle Google search and other POST forms by forwarding the form body
-            const requestBody = JSON.parse(event.body);
-            response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    ...requestBody.headers,
-                    "Content-Type": "application/x-www-form-urlencoded", // Required for search forms like Google
-                },
-                body: requestBody.body || "", // The body may contain the search query
-            });
-        }
+        const response = await fetch(targetUrl, {
+            method: event.httpMethod,
+            headers: {
+                ...event.headers,
+                host: new URL(targetUrl).host,
+            },
+            body: event.httpMethod !== "GET" && event.httpMethod !== "HEAD" ? event.body : undefined,
+        });
 
-        const contentType = response.headers.get("content-type");
+        const contentType = response.headers.get("content-type") || "";
 
         if (!contentType.includes("text/html")) {
             const buffer = await response.arrayBuffer();
@@ -127,11 +131,9 @@ export async function handler(event) {
             };
         }
 
-        // Get and rewrite HTML content
         let html = await response.text();
-        const baseUrl = new URL(url);
+        const baseUrl = new URL(targetUrl);
 
-        // Rewriting relative links for proxy
         html = html.replace(/(href|src|action)=["'](.*?)["']/gi, (match, attr, link) => {
             if (/^(mailto|javascript|data):/.test(link)) return match;
             const fullUrl = new URL(link, baseUrl).toString();

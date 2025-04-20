@@ -80,34 +80,22 @@
     <script>
         function loadProxy() {
             let url = document.getElementById("urlInput").value;
-
-            // Handle Google search form submission by POST request
-            if (url.includes("google.com")) {
-                const searchQuery = new URLSearchParams(window.location.search).get('q');
-                if (searchQuery) {
-                    // Construct Google search URL
-                    const googleSearchUrl = `https://www.google.com/search?q=${searchQuery}`;
-                    // Send request through proxy
-                    const proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(googleSearchUrl)}`;
-                    document.getElementById("proxyFrame").src = proxyUrl;
-                }
-            } else if (!url.startsWith("http")) {
+            if (!url.startsWith("http")) {
                 alert("Please enter a valid URL starting with http:// or https://");
                 return;
-            } else {
-                // Regular URL, use GET request to the proxy
-                let proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
-                document.getElementById("proxyFrame").src = proxyUrl;
             }
+    
+            let proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
+            document.getElementById("proxyFrame").src = proxyUrl;
         }
-        
+    
         function handleKeyPress(event) {
             if (event.key === "Enter") {
                 event.preventDefault();
                 loadProxy();
             }
         }
-
+    
         function toggleFullscreen() {
             let iframe = document.getElementById("proxyFrame");
             if (iframe.requestFullscreen) {
@@ -120,7 +108,7 @@
                 iframe.msRequestFullscreen();
             }
         }
-    </script>
+    </script>    
 
 </body>
 </html>
