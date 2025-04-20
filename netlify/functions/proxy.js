@@ -1,3 +1,80 @@
+// export async function handler(event) {
+//     const url = event.queryStringParameters.url;
+
+//     if (!url) {
+//         return {
+//             statusCode: 400,
+//             headers: corsHeaders(),
+//             body: JSON.stringify({ error: "Missing URL parameter" }),
+//         };
+//     }
+
+//     if (event.httpMethod === "OPTIONS") {
+//         return {
+//             statusCode: 200,
+//             headers: corsHeaders(),
+//             body: "",
+//         };
+//     }
+
+//     try {
+//         const response = await fetch(url);
+//         const contentType = response.headers.get("content-type");
+
+//         // If it's not HTML, just return it as-is
+//         if (!contentType.includes("text/html")) {
+//             const buffer = await response.arrayBuffer();
+//             return {
+//                 statusCode: 200,
+//                 headers: {
+//                     ...corsHeaders(),
+//                     "Content-Type": contentType,
+//                 },
+//                 body: Buffer.from(buffer).toString("base64"),
+//                 isBase64Encoded: true,
+//             };
+//         }
+
+//         // Get and rewrite HTML
+//         let html = await response.text();
+
+//         // Base URL for relative paths
+//         const baseUrl = new URL(url);
+
+//         html = html.replace(/(href|src|action)=["'](.*?)["']/gi, (match, attr, link) => {
+//             // Ignore absolute links (like mailto:, data:, javascript:, etc.)
+//             if (/^(mailto|javascript|data):/.test(link)) return match;
+
+//             // Turn relative URLs into absolute ones
+//             const fullUrl = new URL(link, baseUrl).toString();
+//             return `${attr}="/.netlify/functions/proxy?url=${encodeURIComponent(fullUrl)}"`;
+//         });
+
+//         return {
+//             statusCode: 200,
+//             headers: {
+//                 ...corsHeaders(),
+//                 "Content-Type": "text/html",
+//             },
+//             body: html,
+//         };
+//     } catch (error) {
+//         return {
+//             statusCode: 500,
+//             headers: corsHeaders(),
+//             body: JSON.stringify({ error: error.toString() }),
+//         };
+//     }
+// }
+
+// function corsHeaders() {
+//     return {
+//         "Access-Control-Allow-Origin": "*",
+//         "Access-Control-Allow-Methods": "GET, OPTIONS",
+//         "Access-Control-Allow-Headers": "Content-Type",
+//     };
+// }
+
 export async function handler(event) {
     const url = event.queryStringParameters.url;
 
@@ -37,17 +114,33 @@ export async function handler(event) {
 
         // Get and rewrite HTML
         let html = await response.text();
-
-        // Base URL for relative paths
         const baseUrl = new URL(url);
 
+        // Rewrite href, src, and action attributes
         html = html.replace(/(href|src|action)=["'](.*?)["']/gi, (match, attr, link) => {
-            // Ignore absolute links (like mailto:, data:, javascript:, etc.)
             if (/^(mailto|javascript|data):/.test(link)) return match;
-
-            // Turn relative URLs into absolute ones
             const fullUrl = new URL(link, baseUrl).toString();
             return `${attr}="/.netlify/functions/proxy?url=${encodeURIComponent(fullUrl)}"`;
+        });
+
+        // Rewrite <form> tags: force GET and target the iframe
+        html = html.replace(/<(form\b[^>]*?)>/gi, (match, startTag) => {
+            // Add method="GET" and target="proxyFrame" if not present
+            let updatedTag = startTag;
+
+            if (!/method=/i.test(updatedTag)) {
+                updatedTag += ' method="GET"';
+            } else {
+                updatedTag = updatedTag.replace(/method=["'][^"']*["']/, 'method="GET"');
+            }
+
+            if (!/target=/i.test(updatedTag)) {
+                updatedTag += ' target="proxyFrame"';
+            } else {
+                updatedTag = updatedTag.replace(/target=["'][^"']*["']/, 'target="proxyFrame"');
+            }
+
+            return `<${updatedTag}>`;
         });
 
         return {
