@@ -74,8 +74,8 @@
         display.value += "^(";
     }
 
-    // Rewrite forms inside the iframe after they load
-    document.getElementById("proxyFrame").addEventListener("load", function () {
+       // Rewrite forms inside the iframe after they load
+	   document.getElementById("proxyFrame").addEventListener("load", function () {
         const iframe = this;
         try {
             const doc = iframe.contentDocument || iframe.contentWindow.document;

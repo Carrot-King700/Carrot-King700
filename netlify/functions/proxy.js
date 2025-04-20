@@ -78,20 +78,7 @@
 export async function handler(event) {
     let url = event.queryStringParameters.url;
 
-    // Fallback for form submission without url= (uses Referer)
-    if (!url) {
-        const referer = event.headers.referer;
-        if (referer) {
-            const refererUrl = new URL(referer);
-            const baseUrl = refererUrl.searchParams.get("url");
-
-            if (baseUrl) {
-                const restParams = new URLSearchParams(event.queryStringParameters);
-                url = `${baseUrl}?${restParams.toString()}`;
-            }
-        }
-    }
-
+    // If URL is missing, we return an error message
     if (!url) {
         return {
             statusCode: 400,
@@ -100,6 +87,7 @@ export async function handler(event) {
         };
     }
 
+    // Handling OPTIONS requests (CORS preflight)
     if (event.httpMethod === "OPTIONS") {
         return {
             statusCode: 200,
@@ -109,14 +97,17 @@ export async function handler(event) {
     }
 
     try {
+        // Make the request to the target URL
         const response = await fetch(url, {
             method: event.httpMethod,
             headers: event.headers,
             body: (event.httpMethod !== "GET" && event.httpMethod !== "HEAD") ? event.body : undefined,
         });
 
+        // Get the response content type
         const contentType = response.headers.get("content-type") || "";
 
+        // If the response isn't HTML, return it as-is (image, JSON, etc.)
         if (!contentType.includes("text/html")) {
             const buffer = await response.arrayBuffer();
             return {
@@ -130,6 +121,7 @@ export async function handler(event) {
             };
         }
 
+        // Get the HTML content and rewrite URLs
         let html = await response.text();
         const baseUrl = new URL(url);
 
