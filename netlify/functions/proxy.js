@@ -100,13 +100,11 @@ export async function handler(event) {
             headers: {},
         };
 
-        // Forward POST body
         if (event.httpMethod === "POST" && event.body) {
             fetchOptions.body = event.isBase64Encoded
                 ? Buffer.from(event.body, "base64")
                 : event.body;
 
-            // Forward content-type and content-length
             if (event.headers["content-type"]) {
                 fetchOptions.headers["content-type"] = event.headers["content-type"];
             }
@@ -118,7 +116,6 @@ export async function handler(event) {
         const response = await fetch(url, fetchOptions);
         const contentType = response.headers.get("content-type") || "";
 
-        // Non-HTML (images, scripts, etc)
         if (!contentType.includes("text/html")) {
             const buffer = await response.arrayBuffer();
             return {
@@ -132,17 +129,24 @@ export async function handler(event) {
             };
         }
 
-        // HTML: rewrite links/forms/etc
         let html = await response.text();
         const baseUrl = new URL(url);
 
-        html = html.replace(/(href|src|action)=["'](.*?)["']/gi, (match, attr, link) => {
+        // Rewrite href and src
+        html = html.replace(/(href|src)=["'](.*?)["']/gi, (match, attr, link) => {
             if (/^(mailto|javascript|data):/.test(link)) return match;
             const fullUrl = new URL(link, baseUrl).toString();
             return `${attr}="/.netlify/functions/proxy?url=${encodeURIComponent(fullUrl)}"`;
         });
 
-        // Rewriting <meta http-equiv="refresh"> content="0; url=..."
+        // Rewrite form actions (important for POST like Google search)
+        html = html.replace(/<form([^>]*?)action=["'](.*?)["']/gi, (match, attrs, link) => {
+            if (/^(mailto|javascript|data):/.test(link)) return match;
+            const fullUrl = new URL(link, baseUrl).toString();
+            return `<form${attrs}action="/.netlify/functions/proxy?url=${encodeURIComponent(fullUrl)}"`;
+        });
+
+        // Rewrite meta refresh redirects
         html = html.replace(/http-equiv=["']refresh["'][^>]*content=["'][^;]+;\s*url=([^"']+)["']/gi, (match, redirectUrl) => {
             const fullUrl = new URL(redirectUrl, baseUrl).toString();
             return match.replace(redirectUrl, `/.netlify/functions/proxy?url=${encodeURIComponent(fullUrl)}`);
