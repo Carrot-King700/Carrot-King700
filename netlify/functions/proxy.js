@@ -78,15 +78,17 @@
 export async function handler(event) {
     let url = event.queryStringParameters.url;
 
-    // Rebuild the full URL if it's missing but there are search parameters
+    // Handle form submission case: get original action from referer
     if (!url) {
-        const referer = event.headers.referer || "";
-        const refererURL = new URL(referer);
-        const baseProxyURL = refererURL.searchParams.get("url");
+        const referer = event.headers.referer;
+        if (referer) {
+            const refererURL = new URL(referer);
+            const baseUrlFromReferer = refererURL.searchParams.get("url");
 
-        if (baseProxyURL) {
-            const params = new URLSearchParams(event.queryStringParameters);
-            url = baseProxyURL + "?" + params.toString();
+            if (baseUrlFromReferer) {
+                const params = new URLSearchParams(event.queryStringParameters);
+                url = `${baseUrlFromReferer}?${params.toString()}`;
+            }
         }
     }
 
@@ -111,11 +113,10 @@ export async function handler(event) {
             method: event.httpMethod,
             headers: event.headers,
             body: (event.httpMethod !== "GET" && event.httpMethod !== "HEAD") ? event.body : undefined,
-        });        
+        });
 
-        const contentType = response.headers.get("content-type");
+        const contentType = response.headers.get("content-type") || "";
 
-        // If not HTML, return raw
         if (!contentType.includes("text/html")) {
             const buffer = await response.arrayBuffer();
             return {
@@ -132,19 +133,18 @@ export async function handler(event) {
         let html = await response.text();
         const baseUrl = new URL(url);
 
-        // Rewrite href/src/action
+        // Rewrite all links and forms
         html = html.replace(/(href|src|action)=["'](.*?)["']/gi, (match, attr, link) => {
             if (/^(mailto|javascript|data):/i.test(link)) return match;
             const fullUrl = new URL(link, baseUrl).toString();
             return `${attr}="/.netlify/functions/proxy?url=${encodeURIComponent(fullUrl)}"`;
         });
 
-        // Rewrite <form> tags
-        html = html.replace(/<form\b([^>]*)>/gi, (match, attributes) => {
-            const actionMatch = attributes.match(/action=["'](.*?)["']/i);
-            const originalAction = actionMatch ? new URL(actionMatch[1], baseUrl).toString() : baseUrl.toString();
-
-            return `<form ${attributes.replace(/action=["'].*?["']/, '')} action="/.netlify/functions/proxy" method="GET" target="proxyFrame" data-proxy-url="${originalAction}">`;
+        // Rewrite form tags separately to preserve search parameter submissions
+        html = html.replace(/<form\b([^>]*)>/gi, (match, attrs) => {
+            const actionMatch = attrs.match(/action=["'](.*?)["']/i);
+            const actionUrl = actionMatch ? new URL(actionMatch[1], baseUrl).toString() : baseUrl.toString();
+            return `<form ${attrs.replace(/action=["'].*?["']/, '')} action="/.netlify/functions/proxy" method="GET" data-original-url="${actionUrl}">`;
         });
 
         return {
