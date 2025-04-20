@@ -55,6 +55,7 @@
 
 </body>
 </html> -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,77 +78,45 @@
     <h2>Made by: you might know me but if not then you dont need to know</h2>
 
     <script>
-        // // Function to load the URL into the proxy iframe
-        // function loadProxy() {
-        //     let url = document.getElementById("urlInput").value;
-
-        //     // Check if the URL starts with "http" to ensure it's a valid URL
-        //     if (!url.startsWith("http")) {
-        //         alert("Please enter a valid URL starting with http:// or https://");
-        //         return;
-        //     }
-
-        //     // Construct the full proxy URL with the URL parameter
-        //     let proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
-
-        //     // Update the iframe source with the proxy URL
-        //     document.getElementById("proxyFrame").src = proxyUrl;
-        // }
+        function loadProxy() {
+            let url = document.getElementById("urlInput").value;
+            
+            // Check if it's a Google search query
+            if (url.includes("google.com")) {
+                // Google search query, format correctly
+                let proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
+                document.getElementById("proxyFrame").src = proxyUrl;
+            } else if (!url.startsWith("http")) {
+                alert("Please enter a valid URL starting with http:// or https://");
+                return;
+            } else {
+                // Regular URL, pass to proxy
+                let proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
+                document.getElementById("proxyFrame").src = proxyUrl;
+            }
+        }
         
-        // // Function to handle 'Enter' key press in the input field
-        // function handleKeyPress(event) {
-        //     if (event.key === "Enter") {
-        //         event.preventDefault(); // Prevents form submission or accidental reload
-        //         loadProxy(); // Calls the loadProxy function when 'Enter' is pressed
-        //     }
-        // }
-
-        // // Function to toggle fullscreen mode for the iframe
-        // function toggleFullscreen() {
-        //     let iframe = document.getElementById("proxyFrame");
-        //     if (iframe.requestFullscreen) {
-        //         iframe.requestFullscreen();
-        //     } else if (iframe.mozRequestFullScreen) { // Firefox
-        //         iframe.mozRequestFullScreen();
-        //     } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari, and Opera
-        //         iframe.webkitRequestFullscreen();
-        //     } else if (iframe.msRequestFullscreen) { // IE/Edge
-        //         iframe.msRequestFullscreen();
-        //     }
-        // }
-    function loadProxy() {
-        let url = document.getElementById("urlInput").value;
-        if (!url.startsWith("http")) {
-            alert("Please enter a valid URL starting with http:// or https://");
-            return;
+        // Handle the 'Enter' keypress to trigger the function
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Prevent form submission or accidental reload
+                loadProxy(); // Calls the loadProxy function when 'Enter' is pressed
+            }
         }
 
-        // Construct the full proxy URL with the URL parameter
-        let proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
-
-        // Update iframe source with the new proxy URL
-        document.getElementById("proxyFrame").src = proxyUrl;
-    }
-
-    function handleKeyPress(event) {
-        if (event.key === "Enter") {
-            event.preventDefault(); // Prevents form submission or accidental reload
-            loadProxy(); // Runs the proxy function
+        // Fullscreen toggle function for the iframe
+        function toggleFullscreen() {
+            let iframe = document.getElementById("proxyFrame");
+            if (iframe.requestFullscreen) {
+                iframe.requestFullscreen();
+            } else if (iframe.mozRequestFullScreen) { // Firefox
+                iframe.mozRequestFullScreen();
+            } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari, and Opera
+                iframe.webkitRequestFullscreen();
+            } else if (iframe.msRequestFullscreen) { // IE/Edge
+                iframe.msRequestFullscreen();
+            }
         }
-    }
-
-    function toggleFullscreen() {
-        let iframe = document.getElementById("proxyFrame");
-        if (iframe.requestFullscreen) {
-            iframe.requestFullscreen();
-        } else if (iframe.mozRequestFullScreen) { // Firefox
-            iframe.mozRequestFullScreen();
-        } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari, and Opera
-            iframe.webkitRequestFullscreen();
-        } else if (iframe.msRequestFullscreen) { // IE/Edge
-            iframe.msRequestFullscreen();
-        }
-    }
     </script>
 
 </body>
