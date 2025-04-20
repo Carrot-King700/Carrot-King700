@@ -110,8 +110,8 @@ export async function handler(event) {
         const response = await fetch(url, {
             method: event.httpMethod,
             headers: event.headers,
-            body: event.body,
-        });
+            body: (event.httpMethod !== "GET" && event.httpMethod !== "HEAD") ? event.body : undefined,
+        });        
 
         const contentType = response.headers.get("content-type");
 
