@@ -78,14 +78,15 @@
 export async function handler(event) {
     let url = event.queryStringParameters.url;
 
-    // Try to recover url from form fallback
-    if (!url && event.headers.referer) {
-        const refererUrl = new URL(event.headers.referer);
-        const dataProxyUrl = refererUrl.searchParams.get("url");
-        if (dataProxyUrl) {
-            const originalParams = new URLSearchParams(event.queryStringParameters);
-            originalParams.delete("url");
-            url = `${dataProxyUrl}?${originalParams.toString()}`;
+    // Rebuild the full URL if it's missing but there are search parameters
+    if (!url) {
+        const referer = event.headers.referer || "";
+        const refererURL = new URL(referer);
+        const baseProxyURL = refererURL.searchParams.get("url");
+
+        if (baseProxyURL) {
+            const params = new URLSearchParams(event.queryStringParameters);
+            url = baseProxyURL + "?" + params.toString();
         }
     }
 
@@ -106,9 +107,15 @@ export async function handler(event) {
     }
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            method: event.httpMethod,
+            headers: event.headers,
+            body: event.body,
+        });
+
         const contentType = response.headers.get("content-type");
 
+        // If not HTML, return raw
         if (!contentType.includes("text/html")) {
             const buffer = await response.arrayBuffer();
             return {
@@ -125,24 +132,19 @@ export async function handler(event) {
         let html = await response.text();
         const baseUrl = new URL(url);
 
-        // Rewrite href/src/action attributes
+        // Rewrite href/src/action
         html = html.replace(/(href|src|action)=["'](.*?)["']/gi, (match, attr, link) => {
-            if (/^(mailto|javascript|data):/.test(link)) return match;
+            if (/^(mailto|javascript|data):/i.test(link)) return match;
             const fullUrl = new URL(link, baseUrl).toString();
             return `${attr}="/.netlify/functions/proxy?url=${encodeURIComponent(fullUrl)}"`;
         });
 
-        // Rewrite form tags to use GET + target iframe + data-proxy-url
-        html = html.replace(/<(form\b[^>]*?)>/gi, (match, startTag) => {
-            const actionMatch = startTag.match(/action=["']([^"']+)["']/i);
-            const actionUrl = actionMatch ? actionMatch[1] : baseUrl.toString();
+        // Rewrite <form> tags
+        html = html.replace(/<form\b([^>]*)>/gi, (match, attributes) => {
+            const actionMatch = attributes.match(/action=["'](.*?)["']/i);
+            const originalAction = actionMatch ? new URL(actionMatch[1], baseUrl).toString() : baseUrl.toString();
 
-            // Rewrite action and add method/target/data-proxy-url
-            let rewrittenTag = startTag
-                .replace(/action=["'][^"']*["']/i, '') // remove old action
-                .replace(/\s+$/, ''); // trim
-
-            return `<form ${rewrittenTag} action="/.netlify/functions/proxy" method="GET" target="proxyFrame" data-proxy-url="${actionUrl}">`;
+            return `<form ${attributes.replace(/action=["'].*?["']/, '')} action="/.netlify/functions/proxy" method="GET" target="proxyFrame" data-proxy-url="${originalAction}">`;
         });
 
         return {
@@ -165,7 +167,7 @@ export async function handler(event) {
 function corsHeaders() {
     return {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type",
     };
 }
