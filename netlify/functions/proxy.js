@@ -78,7 +78,10 @@
 export async function handler(event) {
     let url = event.queryStringParameters.url;
 
-    // If URL is missing, we return an error message
+    // Debug log for missing URL
+    console.log("Received URL parameter:", url);
+
+    // Fallback for when URL is not passed directly
     if (!url) {
         return {
             statusCode: 400,
@@ -87,7 +90,6 @@ export async function handler(event) {
         };
     }
 
-    // Handling OPTIONS requests (CORS preflight)
     if (event.httpMethod === "OPTIONS") {
         return {
             statusCode: 200,
@@ -97,17 +99,14 @@ export async function handler(event) {
     }
 
     try {
-        // Make the request to the target URL
         const response = await fetch(url, {
             method: event.httpMethod,
             headers: event.headers,
             body: (event.httpMethod !== "GET" && event.httpMethod !== "HEAD") ? event.body : undefined,
         });
 
-        // Get the response content type
         const contentType = response.headers.get("content-type") || "";
 
-        // If the response isn't HTML, return it as-is (image, JSON, etc.)
         if (!contentType.includes("text/html")) {
             const buffer = await response.arrayBuffer();
             return {
@@ -121,22 +120,14 @@ export async function handler(event) {
             };
         }
 
-        // Get the HTML content and rewrite URLs
         let html = await response.text();
         const baseUrl = new URL(url);
 
-        // Rewrite all href/src/action links
+        // Rewrite links in the HTML to go through the proxy
         html = html.replace(/(href|src|action)=["'](.*?)["']/gi, (match, attr, link) => {
             if (/^(mailto|javascript|data):/i.test(link)) return match;
             const fullUrl = new URL(link, baseUrl).toString();
             return `${attr}="/.netlify/functions/proxy?url=${encodeURIComponent(fullUrl)}"`;
-        });
-
-        // Rewrite form tags to preserve GET submission and set data-proxy-url
-        html = html.replace(/<form\b([^>]*)>/gi, (match, attrs) => {
-            const actionMatch = attrs.match(/action=["'](.*?)["']/i);
-            const actionUrl = actionMatch ? new URL(actionMatch[1], baseUrl).toString() : baseUrl.toString();
-            return `<form ${attrs.replace(/action=["'].*?["']/, '')} action="/.netlify/functions/proxy" method="GET" data-proxy-url="${actionUrl}">`;
         });
 
         return {
@@ -148,6 +139,7 @@ export async function handler(event) {
             body: html,
         };
     } catch (error) {
+        console.error("Proxy error:", error); // Log detailed error
         return {
             statusCode: 500,
             headers: corsHeaders(),
