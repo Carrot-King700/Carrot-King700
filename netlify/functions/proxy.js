@@ -76,28 +76,10 @@
 // }
 
 export async function handler(event) {
-    const urlParam = event.queryStringParameters.url;
-    const originalQuery = event.rawUrl.split('?')[1] || '';
+    const isPost = event.httpMethod === "POST";
+    const isOptions = event.httpMethod === "OPTIONS";
 
-    let targetUrl;
-    if (urlParam) {
-        targetUrl = urlParam;
-    } else {
-        // Reconstruct from Referer + query string
-        const referer = event.headers.referer || '';
-        const refUrl = new URL(referer);
-        const base = decodeURIComponent(refUrl.searchParams.get("url") || "");
-        if (!base) {
-            return {
-                statusCode: 400,
-                headers: corsHeaders(),
-                body: JSON.stringify({ error: "Missing URL parameter" }),
-            };
-        }
-        targetUrl = base.includes('?') ? `${base}&${originalQuery}` : `${base}?${originalQuery}`;
-    }
-
-    if (event.httpMethod === "OPTIONS") {
+    if (isOptions) {
         return {
             statusCode: 200,
             headers: corsHeaders(),
@@ -105,17 +87,37 @@ export async function handler(event) {
         };
     }
 
-    try {
-        const response = await fetch(targetUrl, {
-            method: event.httpMethod,
-            headers: {
-                ...event.headers,
-                host: new URL(targetUrl).host,
-            },
-            body: event.httpMethod !== "GET" && event.httpMethod !== "HEAD" ? event.body : undefined,
-        });
+    let targetUrl;
+    if (isPost) {
+        const contentType = event.headers["content-type"] || "";
+        if (contentType.includes("application/x-www-form-urlencoded")) {
+            const params = new URLSearchParams(event.body);
+            targetUrl = params.get("__proxy_target");
+        }
+    } else {
+        targetUrl = event.queryStringParameters.url;
+    }
 
-        const contentType = response.headers.get("content-type") || "";
+    if (!targetUrl) {
+        return {
+            statusCode: 400,
+            headers: corsHeaders(),
+            body: JSON.stringify({ error: "Missing URL parameter" }),
+        };
+    }
+
+    try {
+        const fetchOptions = {
+            method: event.httpMethod,
+            headers: { ...event.headers },
+        };
+
+        if (isPost) {
+            fetchOptions.body = event.body;
+        }
+
+        const response = await fetch(targetUrl, fetchOptions);
+        const contentType = response.headers.get("content-type");
 
         if (!contentType.includes("text/html")) {
             const buffer = await response.arrayBuffer();
@@ -133,10 +135,16 @@ export async function handler(event) {
         let html = await response.text();
         const baseUrl = new URL(targetUrl);
 
-        html = html.replace(/(href|src|action)=["'](.*?)["']/gi, (match, attr, link) => {
+        html = html.replace(/(href|src)=["'](.*?)["']/gi, (match, attr, link) => {
             if (/^(mailto|javascript|data):/.test(link)) return match;
             const fullUrl = new URL(link, baseUrl).toString();
             return `${attr}="/.netlify/functions/proxy?url=${encodeURIComponent(fullUrl)}"`;
+        });
+
+        html = html.replace(/<form[^>]*action=["'](.*?)["'][^>]*>/gi, (match, action) => {
+            const fullAction = new URL(action || baseUrl, baseUrl).toString();
+            return match.replace(action, "/.netlify/functions/proxy") +
+                   `<input type="hidden" name="__proxy_target" value="${fullAction}">`;
         });
 
         return {

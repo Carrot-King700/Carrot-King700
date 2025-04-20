@@ -62,20 +62,22 @@
     <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scientific Calculator</title>
+    <title>Proxy Browser</title>
 </head>
 <body>
 
     <h1>You Made it!</h1>
-    <h2>Searching on websites currently does not work</h2>
+    <h2>Searching on websites should now work 🎉</h2>
+
     <input type="text" id="urlInput" placeholder="Start With https://" onkeydown="handleKeyPress(event)" />
-    <button onclick="loadProxy()">Idk what to call it but just press enter</button>
+    <button onclick="loadProxy()">Go</button>
     
     <div id="iframeContainer">
         <iframe id="proxyFrame"></iframe>
         <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
     </div>
-    <h2>Made by: you might know me but if not then you dont need to know</h2>
+
+    <h2>Made by: you might know me but if not then you don’t need to know</h2>
 
     <script>
         function loadProxy() {
@@ -84,18 +86,18 @@
                 alert("Please enter a valid URL starting with http:// or https://");
                 return;
             }
-    
+
             let proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
             document.getElementById("proxyFrame").src = proxyUrl;
         }
-    
+
         function handleKeyPress(event) {
             if (event.key === "Enter") {
                 event.preventDefault();
                 loadProxy();
             }
         }
-    
+
         function toggleFullscreen() {
             let iframe = document.getElementById("proxyFrame");
             if (iframe.requestFullscreen) {
@@ -108,7 +110,7 @@
                 iframe.msRequestFullscreen();
             }
         }
-    </script>    
+    </script>
 
 </body>
 </html>
