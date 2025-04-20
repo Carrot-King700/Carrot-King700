@@ -76,7 +76,18 @@
 // }
 
 export async function handler(event) {
-    const url = event.queryStringParameters.url;
+    let url = event.queryStringParameters.url;
+
+    // Try to recover url from form fallback
+    if (!url && event.headers.referer) {
+        const refererUrl = new URL(event.headers.referer);
+        const dataProxyUrl = refererUrl.searchParams.get("url");
+        if (dataProxyUrl) {
+            const originalParams = new URLSearchParams(event.queryStringParameters);
+            originalParams.delete("url");
+            url = `${dataProxyUrl}?${originalParams.toString()}`;
+        }
+    }
 
     if (!url) {
         return {
@@ -98,7 +109,6 @@ export async function handler(event) {
         const response = await fetch(url);
         const contentType = response.headers.get("content-type");
 
-        // If it's not HTML, just return it as-is
         if (!contentType.includes("text/html")) {
             const buffer = await response.arrayBuffer();
             return {
@@ -112,35 +122,27 @@ export async function handler(event) {
             };
         }
 
-        // Get and rewrite HTML
         let html = await response.text();
         const baseUrl = new URL(url);
 
-        // Rewrite href, src, and action attributes
+        // Rewrite href/src/action attributes
         html = html.replace(/(href|src|action)=["'](.*?)["']/gi, (match, attr, link) => {
             if (/^(mailto|javascript|data):/.test(link)) return match;
             const fullUrl = new URL(link, baseUrl).toString();
             return `${attr}="/.netlify/functions/proxy?url=${encodeURIComponent(fullUrl)}"`;
         });
 
-        // Rewrite <form> tags: force GET and target the iframe
+        // Rewrite form tags to use GET + target iframe + data-proxy-url
         html = html.replace(/<(form\b[^>]*?)>/gi, (match, startTag) => {
-            // Add method="GET" and target="proxyFrame" if not present
-            let updatedTag = startTag;
+            const actionMatch = startTag.match(/action=["']([^"']+)["']/i);
+            const actionUrl = actionMatch ? actionMatch[1] : baseUrl.toString();
 
-            if (!/method=/i.test(updatedTag)) {
-                updatedTag += ' method="GET"';
-            } else {
-                updatedTag = updatedTag.replace(/method=["'][^"']*["']/, 'method="GET"');
-            }
+            // Rewrite action and add method/target/data-proxy-url
+            let rewrittenTag = startTag
+                .replace(/action=["'][^"']*["']/i, '') // remove old action
+                .replace(/\s+$/, ''); // trim
 
-            if (!/target=/i.test(updatedTag)) {
-                updatedTag += ' target="proxyFrame"';
-            } else {
-                updatedTag = updatedTag.replace(/target=["'][^"']*["']/, 'target="proxyFrame"');
-            }
-
-            return `<${updatedTag}>`;
+            return `<form ${rewrittenTag} action="/.netlify/functions/proxy" method="GET" target="proxyFrame" data-proxy-url="${actionUrl}">`;
         });
 
         return {
