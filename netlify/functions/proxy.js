@@ -78,16 +78,16 @@
 export async function handler(event) {
     let url = event.queryStringParameters.url;
 
-    // Handle form submission case: get original action from referer
+    // Fallback for form submission without url= (uses Referer)
     if (!url) {
         const referer = event.headers.referer;
         if (referer) {
-            const refererURL = new URL(referer);
-            const baseUrlFromReferer = refererURL.searchParams.get("url");
+            const refererUrl = new URL(referer);
+            const baseUrl = refererUrl.searchParams.get("url");
 
-            if (baseUrlFromReferer) {
-                const params = new URLSearchParams(event.queryStringParameters);
-                url = `${baseUrlFromReferer}?${params.toString()}`;
+            if (baseUrl) {
+                const restParams = new URLSearchParams(event.queryStringParameters);
+                url = `${baseUrl}?${restParams.toString()}`;
             }
         }
     }
@@ -133,18 +133,18 @@ export async function handler(event) {
         let html = await response.text();
         const baseUrl = new URL(url);
 
-        // Rewrite all links and forms
+        // Rewrite all href/src/action links
         html = html.replace(/(href|src|action)=["'](.*?)["']/gi, (match, attr, link) => {
             if (/^(mailto|javascript|data):/i.test(link)) return match;
             const fullUrl = new URL(link, baseUrl).toString();
             return `${attr}="/.netlify/functions/proxy?url=${encodeURIComponent(fullUrl)}"`;
         });
 
-        // Rewrite form tags separately to preserve search parameter submissions
+        // Rewrite form tags to preserve GET submission and set data-proxy-url
         html = html.replace(/<form\b([^>]*)>/gi, (match, attrs) => {
             const actionMatch = attrs.match(/action=["'](.*?)["']/i);
             const actionUrl = actionMatch ? new URL(actionMatch[1], baseUrl).toString() : baseUrl.toString();
-            return `<form ${attrs.replace(/action=["'].*?["']/, '')} action="/.netlify/functions/proxy" method="GET" data-original-url="${actionUrl}">`;
+            return `<form ${attrs.replace(/action=["'].*?["']/, '')} action="/.netlify/functions/proxy" method="GET" data-proxy-url="${actionUrl}">`;
         });
 
         return {

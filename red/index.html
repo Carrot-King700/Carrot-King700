@@ -73,6 +73,33 @@
         let display = document.getElementById("display");
         display.value += "^(";
     }
+
+    // Rewrite forms inside the iframe after they load
+    document.getElementById("proxyFrame").addEventListener("load", function () {
+        const iframe = this;
+        try {
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+
+            // Loop through all forms and rewrite their action to go through the proxy
+            const forms = doc.querySelectorAll("form");
+            forms.forEach(form => {
+                const originalAction = form.action;
+
+                if (!originalAction) return;
+
+                const hiddenInput = doc.createElement("input");
+                hiddenInput.type = "hidden";
+                hiddenInput.name = "url";
+                hiddenInput.value = originalAction;
+
+                form.action = "/.netlify/functions/proxy";
+                form.method = form.method || "GET"; // default to GET
+                form.appendChild(hiddenInput);
+            });
+        } catch (e) {
+            console.warn("Could not rewrite forms:", e);
+        }
+    });
 </script>	
 </head>
 <body>
