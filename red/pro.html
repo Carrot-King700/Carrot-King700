@@ -80,40 +80,38 @@
     <script>
         function loadProxy() {
             let url = document.getElementById("urlInput").value;
-            
-            // Check if it's a Google search query
+
+            // Detect Google search query
             if (url.includes("google.com")) {
-                // Google search query, format correctly
-                let proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
-                document.getElementById("proxyFrame").src = proxyUrl;
+                // If it's a Google search, send it as a POST request to the proxy
+                const searchUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
+                document.getElementById("proxyFrame").src = searchUrl;
             } else if (!url.startsWith("http")) {
                 alert("Please enter a valid URL starting with http:// or https://");
                 return;
             } else {
-                // Regular URL, pass to proxy
+                // Regular URL, use GET request to the proxy
                 let proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
                 document.getElementById("proxyFrame").src = proxyUrl;
             }
         }
         
-        // Handle the 'Enter' keypress to trigger the function
         function handleKeyPress(event) {
             if (event.key === "Enter") {
-                event.preventDefault(); // Prevent form submission or accidental reload
-                loadProxy(); // Calls the loadProxy function when 'Enter' is pressed
+                event.preventDefault();
+                loadProxy();
             }
         }
 
-        // Fullscreen toggle function for the iframe
         function toggleFullscreen() {
             let iframe = document.getElementById("proxyFrame");
             if (iframe.requestFullscreen) {
                 iframe.requestFullscreen();
-            } else if (iframe.mozRequestFullScreen) { // Firefox
+            } else if (iframe.mozRequestFullScreen) {
                 iframe.mozRequestFullScreen();
-            } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari, and Opera
+            } else if (iframe.webkitRequestFullscreen) {
                 iframe.webkitRequestFullscreen();
-            } else if (iframe.msRequestFullscreen) { // IE/Edge
+            } else if (iframe.msRequestFullscreen) {
                 iframe.msRequestFullscreen();
             }
         }
@@ -121,4 +119,3 @@
 
 </body>
 </html>
-

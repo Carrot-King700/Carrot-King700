@@ -95,23 +95,25 @@ export async function handler(event) {
     }
 
     try {
-        // For GET requests
         let response;
+        
         if (event.httpMethod === "GET") {
             response = await fetch(url);
         } else if (event.httpMethod === "POST") {
-            // Handle form POST requests like Google search
-            const requestBody = JSON.parse(event.body); // Parse POST body if it's JSON
+            // Handle Google search and other POST forms by forwarding the form body
+            const requestBody = JSON.parse(event.body);
             response = await fetch(url, {
                 method: "POST",
-                headers: requestBody.headers || {},
-                body: requestBody.body || "",
+                headers: {
+                    ...requestBody.headers,
+                    "Content-Type": "application/x-www-form-urlencoded", // Required for search forms like Google
+                },
+                body: requestBody.body || "", // The body may contain the search query
             });
         }
 
         const contentType = response.headers.get("content-type");
 
-        // If it's not HTML, just return it as-is (images, CSS, etc.)
         if (!contentType.includes("text/html")) {
             const buffer = await response.arrayBuffer();
             return {
@@ -125,13 +127,13 @@ export async function handler(event) {
             };
         }
 
-        // Handle HTML content
+        // Get and rewrite HTML content
         let html = await response.text();
         const baseUrl = new URL(url);
 
-        // Rewrite relative URLs to absolute URLs for the proxy
+        // Rewriting relative links for proxy
         html = html.replace(/(href|src|action)=["'](.*?)["']/gi, (match, attr, link) => {
-            if (/^(mailto|javascript|data):/.test(link)) return match; // Skip non-HTTP links
+            if (/^(mailto|javascript|data):/.test(link)) return match;
             const fullUrl = new URL(link, baseUrl).toString();
             return `${attr}="/.netlify/functions/proxy?url=${encodeURIComponent(fullUrl)}"`;
         });
