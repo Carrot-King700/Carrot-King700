@@ -79,12 +79,11 @@ export async function handler(event) {
     const urlParam = event.queryStringParameters.url;
     const originalQuery = event.rawUrl.split('?')[1] || '';
 
-    // If no full URL is given, try to rebuild from query string
     let targetUrl;
     if (urlParam) {
         targetUrl = urlParam;
     } else {
-        // Try rebuilding it
+        // Reconstruct from Referer + query string
         const referer = event.headers.referer || '';
         const refUrl = new URL(referer);
         const base = decodeURIComponent(refUrl.searchParams.get("url") || "");
