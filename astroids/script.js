@@ -129,7 +129,6 @@ scene("game", () => {
     } else {
       console.log("dead")
     }
-
   })
 
 
@@ -222,7 +221,10 @@ scene("game", () => {
   player.onCollide("asteroid", (a) => {
     lives--
     if (lives === 0) {
-      console.log("Your Dead")  
+      console.log("Your Dead")
+        onKeyPress("space", () => {       //new
+          return scene("game")            //new
+        })                                //new
     } else {
       setTimeout(function () {
         // respawn with Iframes
