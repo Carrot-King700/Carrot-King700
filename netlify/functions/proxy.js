@@ -73,7 +73,7 @@
 //         "Access-Control-Allow-Methods": "GET, OPTIONS",
 //         "Access-Control-Allow-Headers": "Content-Type",
 //     };
-// }
+// }  
 
 export async function handler(event) {
     const url = event.queryStringParameters.url;
@@ -81,12 +81,12 @@ export async function handler(event) {
     if (!url) {
       return {
         statusCode: 400,
+        body: JSON.stringify({ error: "Missing URL parameter" }),
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type",
         },
-        body: JSON.stringify({ error: "Missing URL parameter" }),
       };
     }
   
