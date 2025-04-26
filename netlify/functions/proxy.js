@@ -81,16 +81,16 @@ export async function handler(event) {
     if (!url) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Missing URL parameter" }),
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type",
         },
+        body: JSON.stringify({ error: "Missing URL parameter" }),
       };
     }
   
-    // Handle CORS preflight request
+    // Handle preflight CORS
     if (event.httpMethod === "OPTIONS") {
       return {
         statusCode: 200,
@@ -106,35 +106,37 @@ export async function handler(event) {
     try {
       const response = await fetch(url, {
         method: event.httpMethod,
-        headers: event.headers,
-        body: event.body,
+        headers: {
+          "Content-Type": event.headers["content-type"] || "application/x-www-form-urlencoded"
+        },
+        body: event.httpMethod === "POST" ? event.body : undefined,
       });
   
-      const contentType = response.headers.get("content-type") || "text/plain";
-      const responseBody = await response.text();
+      const contentType = response.headers.get("content-type");
+      const body = await response.text();
   
       return {
-        statusCode: response.status,
+        statusCode: 200,
         headers: {
-          "Content-Type": contentType,
+          "Content-Type": contentType || "text/plain",
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type",
         },
-        body: responseBody,
+        body,
       };
-    } catch (err) {
+    } catch (error) {
       return {
         statusCode: 500,
-        body: JSON.stringify({
-          error: "Proxy fetch failed",
-          details: err.message,
-        }),
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type",
         },
+        body: JSON.stringify({
+          error: "Proxy fetch failed",
+          details: error.message,
+        }),
       };
     }
   }
