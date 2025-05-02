@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+body {
+  background: gray;
+  overflow: hidden;
+  color: white;
+  text-align: center;
+}
+
+#score {
+  font-size: 2.5em;
+  font-family: "Bebas Neue", sans-serif;
+  color: aquamarine;
+}
