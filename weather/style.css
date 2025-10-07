@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+body {
+  background: gray;
+  overflow: hidden;
+  color: white;
+  text-align: center;
+}
+
+#text1 {
+  width: 90%;
+  height: 90%;
+}
+
+#text-main {
+  width: 100%;
+  height: 100%;
+}
