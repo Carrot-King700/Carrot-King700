@@ -1,11 +1,10 @@
+const SPACEBAR = 32
 let olds, level, dim, t, block, speed
 let shape
 let fading = []
 let gameOver
 let scoreDiv = document.getElementById("score")
-function preload() {
-    shape = loadModel("rocket.obj")
-}
+
 function setup() {
     createCanvas(500,500,WEBGL).parent("game")
     fading = olds || []
@@ -56,12 +55,6 @@ function drawBlock(b) {
     stroke("#c50")
     //stroke(((b.y-10)/-2)%100, 50, 80)
     box(b.w, 10, b.d)
-    translate(15, -5, 10)
-    rotateX(90)
-    rotateZ(180)
-    noStroke()
-    fill("green")
-    model(shape)
     pop()
 }
 
@@ -89,6 +82,63 @@ function drawFading(b) {
 
 function mousePressed() {
     if(gameOver) return setup()
+    t = 0
+    let last = olds[level]
+    level++
+    if(level%4>=2) t+=180/speed
+    olds.push(
+        {
+            x: block.x,
+            y: block.y,
+            z:block.z,
+            w: block.w,
+            d: block.d,
+            alpha: 100
+        }
+    )
+    fading.push(
+        {
+            x: block.x,
+            y: block.y,
+            z:block.z,
+            w: block.w,
+            d: block.d,
+            alpha: 100
+        }
+    )
+    let lastFall = fading[fading.length-1]
+    let dist = last[dim] - block[dim]
+    let dir = dist/abs(dist)
+    last = olds[level]
+    last[dim] += dist/2
+    block[dim] = last[dim]
+    if(dim === "x") {
+        last.w -= abs(dist)
+        block.w = last.w
+        lastFall.w = abs(dist)
+        lastFall.x -= block.w/2*dir
+        dim="z"
+    }
+    else {
+        last.d -= abs(dist)
+        block.d = last.d
+        lastFall.d = abs(dist)
+        lastFall.z -= block.d/2*dir
+        dim = "x"
+    }
+    let size = block.d * block.w
+    if(size < 5) {
+        olds.pop()
+        fading.pop()
+        gameOver = true
+        level--
+    }  
+    speed = 1.5 + level * 0.1
+}
+
+function keyPressed() {
+    if(gameOver) return setup()
+    if(keyCode !== SPACEBAR) return
     t = 0
     let last = olds[level]
     level++
