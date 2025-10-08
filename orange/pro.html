@@ -1,69 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="style.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scientific Calculator</title>
+  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scientific Calculator</title>
 </head>
 <body>
 
-    <h1>You Made it!</h1>
-    <h2>Embed any site below (some will open in a new tab if blocked)</h2>
+  <h1>You Made it!</h1>
+  <h2>Now supports searching & form submissions 🎉</h2>
 
-    <input type="text" id="urlInput" placeholder="Start With https://" onkeydown="handleKeyPress(event)" />
-    <button onclick="embedSite()">Go</button>
-    
-    <div id="iframeContainer">
-        <iframe id="embedFrame"></iframe>
-        <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
-    </div>
+  <input type="text" id="urlInput" placeholder="Start With https://" onkeydown="handleKeyPress(event)" />
+  <button onclick="loadProxy()">Go</button>
 
-    <h2>Made by: you might know me but if not then you dont need to know</h2>
+  <div id="iframeContainer">
+    <iframe id="proxyFrame"></iframe>
+    <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+  </div>
 
-    <script>
-        function embedSite() {
-            let url = document.getElementById("urlInput").value.trim();
+  <h2>Made by: you might know me but if not then you don’t need to know</h2>
 
-            // Add https:// automatically if missing
-            if (!url.startsWith("http")) {
-                url = "https://" + url;
-            }
+  <script>
+    function loadProxy() {
+      const url = document.getElementById("urlInput").value.trim();
+      if (!url.startsWith("http")) {
+        alert("Please enter a valid URL starting with http:// or https://");
+        return;
+      }
+      const proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
+      document.getElementById("proxyFrame").src = proxyUrl;
+    }
 
-            const iframe = document.getElementById("embedFrame");
+    function handleKeyPress(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        loadProxy();
+      }
+    }
 
-            // Try to embed the site
-            iframe.src = url;
-
-            // Check if it loads correctly or is blocked
-            setTimeout(() => {
-                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                // If we can't access the iframe, it's blocked
-                try {
-                    const test = iframeDoc.body.innerHTML;
-                } catch (e) {
-                    console.warn("Embedding blocked, opening in new tab...");
-                    iframe.src = "about:blank"; // clear iframe
-                    window.open(url, "_blank"); // open in new tab
-                }
-            }, 2000);
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                embedSite();
-            }
-        }
-
-        function toggleFullscreen() {
-            const iframe = document.getElementById("embedFrame");
-            if (iframe.requestFullscreen) iframe.requestFullscreen();
-            else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
-            else if (iframe.mozRequestFullScreen) iframe.mozRequestFullScreen();
-            else if (iframe.msRequestFullscreen) iframe.msRequestFullscreen();
-        }
-    </script>
-
+    function toggleFullscreen() {
+      const iframe = document.getElementById("proxyFrame");
+      if (iframe.requestFullscreen) iframe.requestFullscreen();
+      else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+      else if (iframe.msRequestFullscreen) iframe.msRequestFullscreen();
+    }
+  </script>
 </body>
 </html>
