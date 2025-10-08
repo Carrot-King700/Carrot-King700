@@ -9,47 +9,43 @@
 <body>
 
     <h1>You Made it!</h1>
-    <h2>Searching on websites currently does not work</h2>
+    <h2>Embed any site below (some may block embeds)</h2>
+
     <input type="text" id="urlInput" placeholder="Start With https://" onkeydown="handleKeyPress(event)" />
-    <button onclick="loadProxy()">Idk what to call it but just press enter</button>
+    <button onclick="embedSite()">Go</button>
     
     <div id="iframeContainer">
-        <iframe id="proxyFrame"></iframe>
+        <iframe id="embedFrame"></iframe>
         <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
     </div>
+
     <h2>Made by: you might know me but if not then you dont need to know</h2>
 
     <script>
-        function loadProxy() {
-            let url = document.getElementById("urlInput").value;
+        function embedSite() {
+            let url = document.getElementById("urlInput").value.trim();
+
+            // Add https:// automatically if missing
             if (!url.startsWith("http")) {
-                alert("Please enter a valid URL starting with http:// or https://");
-                return;
+                url = "https://" + url;
             }
 
-            let proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
-            document.getElementById("proxyFrame").src = proxyUrl;
+            document.getElementById("embedFrame").src = url;
         }
-        
 
         function handleKeyPress(event) {
-    if (event.key === "Enter") {
-        event.preventDefault(); // Prevents form submission or accidental reload
-        loadProxy(); // Runs the proxy function
-    }
-}
+            if (event.key === "Enter") {
+                event.preventDefault();
+                embedSite();
+            }
+        }
 
         function toggleFullscreen() {
-            let iframe = document.getElementById("proxyFrame");
-            if (iframe.requestFullscreen) {
-                iframe.requestFullscreen();
-            } else if (iframe.mozRequestFullScreen) { // Firefox
-                iframe.mozRequestFullScreen();
-            } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari, and Opera
-                iframe.webkitRequestFullscreen();
-            } else if (iframe.msRequestFullscreen) { // IE/Edge
-                iframe.msRequestFullscreen();
-            }
+            const iframe = document.getElementById("embedFrame");
+            if (iframe.requestFullscreen) iframe.requestFullscreen();
+            else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+            else if (iframe.mozRequestFullScreen) iframe.mozRequestFullScreen();
+            else if (iframe.msRequestFullscreen) iframe.msRequestFullscreen();
         }
     </script>
 
