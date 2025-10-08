@@ -1,5 +1,8 @@
 export async function handler(event) {
-  const targetUrl = event.queryStringParameters.url || event.headers["x-target-url"];
+  const queryUrl = event.queryStringParameters.url;
+  const targetUrl = queryUrl || event.headers["x-target-url"];
+
+  // Handle missing URL
   if (!targetUrl) {
     return jsonResponse(400, { error: "Missing URL parameter" });
   }
@@ -16,29 +19,39 @@ export async function handler(event) {
 
     const init = { method, headers };
     if (!["GET", "HEAD"].includes(method) && event.body) {
-      init.body = event.body;
+      init.body = event.isBase64Encoded
+        ? Buffer.from(event.body, "base64")
+        : event.body;
     }
 
     const response = await fetch(targetUrl, init);
     const contentType = response.headers.get("content-type") || "";
+    const newHeaders = { ...corsHeaders() };
 
-    // For text or HTML content
-    if (contentType.includes("text") || contentType.includes("html")) {
+    // Strip anti-embed headers
+    for (const [key, value] of response.headers.entries()) {
+      if (!/x-frame-options|content-security-policy/i.test(key)) {
+        newHeaders[key] = value;
+      }
+    }
+
+    // Handle HTML rewriting
+    if (contentType.includes("text/html")) {
       let html = await response.text();
 
-      // Fix relative URLs (href/src)
+      // Rewrite relative links
       html = html.replace(/(href|src)="(?!http|\/\/)([^"]+)"/g, (m, attr, path) => {
-        const fixedUrl = new URL(path, targetUrl).href;
-        return `${attr}="https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(fixedUrl)}"`;
+        const abs = new URL(path, targetUrl).href;
+        return `${attr}="https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(abs)}"`;
       });
 
-      // Fix form actions
+      // Fix form actions (including Google)
       html = html.replace(/<form([^>]*?)action="([^"]*)"([^>]*)>/g, (match, pre, action, post) => {
         const abs = new URL(action || targetUrl, targetUrl).href;
-        return `<form${pre}action="https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(abs)}"${post} target="_self">`;
+        return `<form${pre}action="https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(abs)}"${post} target="_self" method="post">`;
       });
 
-      // Inject JS to dynamically rewrite links
+      // Inject JavaScript to rewrite navigation
       const injector = `
         <script>
         document.addEventListener("click", e => {
@@ -61,22 +74,16 @@ export async function handler(event) {
 
       return {
         statusCode: 200,
-        headers: {
-          ...corsHeaders(),
-          "Content-Type": "text/html; charset=utf-8",
-        },
+        headers: { ...newHeaders, "Content-Type": "text/html; charset=utf-8" },
         body: html,
       };
     }
 
-    // For binary or other content
+    // Handle non-HTML (images, etc.)
     const buffer = await response.arrayBuffer();
     return {
       statusCode: response.status,
-      headers: {
-        ...corsHeaders(),
-        "Content-Type": contentType,
-      },
+      headers: newHeaders,
       body: Buffer.from(buffer).toString("base64"),
       isBase64Encoded: true,
     };
