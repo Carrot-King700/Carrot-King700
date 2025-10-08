@@ -9,7 +9,7 @@
 <body>
 
     <h1>You Made it!</h1>
-    <h2>Embed any site below (some may block embeds)</h2>
+    <h2>Embed any site below (some will open in a new tab if blocked)</h2>
 
     <input type="text" id="urlInput" placeholder="Start With https://" onkeydown="handleKeyPress(event)" />
     <button onclick="embedSite()">Go</button>
@@ -30,7 +30,23 @@
                 url = "https://" + url;
             }
 
-            document.getElementById("embedFrame").src = url;
+            const iframe = document.getElementById("embedFrame");
+
+            // Try to embed the site
+            iframe.src = url;
+
+            // Check if it loads correctly or is blocked
+            setTimeout(() => {
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                // If we can't access the iframe, it's blocked
+                try {
+                    const test = iframeDoc.body.innerHTML;
+                } catch (e) {
+                    console.warn("Embedding blocked, opening in new tab...");
+                    iframe.src = "about:blank"; // clear iframe
+                    window.open(url, "_blank"); // open in new tab
+                }
+            }, 2000);
         }
 
         function handleKeyPress(event) {
