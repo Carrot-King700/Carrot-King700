@@ -11,7 +11,7 @@ function setup() {
     g.currTime = millis()
     g.started = false
     g.win = false
-    g.debug = true
+    g.debug = false
     createCanvas(g.width * g.sq, (g.height + 2.5) * g.sq)
     textAlign(CENTER, CENTER)
     document.addEventListener('contextmenu', event => event.preventDefault())
