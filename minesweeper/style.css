@@ -9,3 +9,21 @@ h1 {
   color: red;
   font-size: 2em;
 }
+
+.tab-buttons {
+    color: white;
+    text-decoration: none;
+    font-size: 30px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #c50;
+  }
+  
+  .tab-buttons:hover {
+    color: black;
+    text-decoration: underline;
+    font-size: 30px;
+    background-color: rgb(223, 108, 27);
+    padding: 8px;
+    margin: 12px;
+  }
