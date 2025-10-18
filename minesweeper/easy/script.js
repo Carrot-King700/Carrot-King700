@@ -3,7 +3,7 @@ function setup() {
     g = {}
     g.width = 9
     g.height = 9
-    g.sq = windowHeight / g.height - 200
+    g.sq = 25
     g.nBombs = 10
     g.marked = 0
     g.dead = false

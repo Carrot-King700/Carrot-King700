@@ -1,6 +1,6 @@
 body {
   background: gray;
-  overflow: hidden;
+  overflow: auto;
   color: white;
   text-align: center;
 }
