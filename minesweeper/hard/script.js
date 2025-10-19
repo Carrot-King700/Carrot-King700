@@ -4,7 +4,7 @@ function setup() {
     g.width = 30
     g.height = 30
     g.sq = 25
-    g.nBombs = 25
+    g.nBombs = 225
     g.marked = 0
     g.dead = false
     g.startTime = millis()
