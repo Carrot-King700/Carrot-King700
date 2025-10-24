@@ -14,7 +14,6 @@ function setup() {
     g.debug = false
     let c = createCanvas(g.width * g.sq, (g.height + 2.5) * g.sq)
     c.parent("canvas_area")
-    //createCanvas(g.width * g.sq, (g.height + 2.5) * g.sq)
     textAlign(CENTER, CENTER)
     document.addEventListener('contextmenu', event => event.preventDefault())
     background(100)
