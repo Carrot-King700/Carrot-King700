@@ -1,50 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="style.css">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scientific Calculator</title>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
 </head>
 <body>
 
-  <h1>You Made it!</h1>
-  <h2>Now supports searching & form submissions 🎉</h2>
+    <h1>You Made it!</h1>
+    <h2>Now supports searching + games 🎉</h2>
 
-  <input type="text" id="urlInput" placeholder="Start With https://" onkeydown="handleKeyPress(event)" />
-  <button onclick="loadProxy()">Go</button>
+    <input type="text" id="urlInput" placeholder="Start With https://" onkeydown="handleKeyPress(event)" />
+    <button onclick="openEmbed()">Open Site</button>
 
-  <div id="iframeContainer">
-    <iframe id="proxyFrame"></iframe>
-    <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
-  </div>
+    <h2>Made by: you might know me but if not then you dont need to know</h2>
 
-  <h2>Made by: you might know me but if not then you don’t need to know</h2>
+    <script>
+        function openEmbed() {
+            let url = document.getElementById("urlInput").value.trim();
 
-  <script>
-    function loadProxy() {
-      const url = document.getElementById("urlInput").value.trim();
-      if (!url.startsWith("http")) {
-        alert("Please enter a valid URL starting with http:// or https://");
-        return;
-      }
-      const proxyUrl = `https://gregarious-piroshki-a874a0.netlify.app/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
-      document.getElementById("proxyFrame").src = proxyUrl;
-    }
+            // Auto-fix missing protocol
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                url = "https://" + url;
+            }
 
-    function handleKeyPress(event) {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        loadProxy();
-      }
-    }
+            // Open new blank tab
+            let win = window.open("about:blank", "_blank");
 
-    function toggleFullscreen() {
-      const iframe = document.getElementById("proxyFrame");
-      if (iframe.requestFullscreen) iframe.requestFullscreen();
-      else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
-      else if (iframe.msRequestFullscreen) iframe.msRequestFullscreen();
-    }
-  </script>
+            // Set tab title
+            win.document.title = "Scientific Calculator";
+
+            // Make page full screen
+            win.document.body.style.margin = "0";
+            win.document.body.style.height = "100vh";
+            win.document.body.style.background = "black";
+
+            // Create iframe
+            let iframe = win.document.createElement("iframe");
+            iframe.style.border = "none";
+            iframe.style.width = "100%";
+            iframe.style.height = "100%";
+            iframe.allow = "fullscreen";
+            iframe.referrerPolicy = "no-referrer";
+
+            iframe.src = url;
+            win.document.body.appendChild(iframe);
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                openEmbed();
+            }
+        }
+    </script>
+
 </body>
 </html>
