@@ -1,175 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<link rel="stylesheet" href="style.css">
-	<title>Scientific Calculator</title>
-	<script src=
-"https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.6.4/math.js"
-			integrity=
-"sha512-BbVEDjbqdN3Eow8+empLMrJlxXRj5nEitiCAK5A1pUr66+jLVejo3PmjIaucRnjlB0P9R3rBUs3g5jXc8ti+fQ=="
-			crossorigin="anonymous"
-			referrerpolicy="no-referrer">
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        let display = document.getElementById("display");
-
-        // Ensure clicking "Enter" triggers the calculation
-        display.addEventListener("keydown", function (event) {
-            if (event.key === "Enter") {
-                event.preventDefault(); // Prevents form submission issues
-                calculate();
-            }
-        });
-    });
-
-    function backspace() {
-        let display = document.getElementById("display");
-        display.value = display.value.slice(0, -1);
-    }
-
-    function calculate() {
-        let display = document.getElementById("display");
-        let expression = display.value;
-		if(expression === "9837461038") {
-		window.location.href = "pro"
-	}
-        let result;
-
-        try {
-            // Convert trigonometric function inputs from degrees to radians
-            expression = expression.replace(/sin\(/g, 'sin(' + Math.PI / 180 + '*');
-            expression = expression.replace(/cos\(/g, 'cos(' + Math.PI / 180 + '*');
-            expression = expression.replace(/tan\(/g, 'tan(' + Math.PI / 180 + '*');
-
-            result = math.evaluate(expression);
-            display.value = result;
-        } catch (error) {
-            display.value = "Error";
-        }
-    }
-
-    function squareRoot() {
-        let display = document.getElementById("display");
-        display.value += "sqrt(";
-    }
-
-    function base10Log() {
-        let display = document.getElementById("display");
-        display.value += "log(";
-    }
-
-    function pi() {
-        let display = document.getElementById("display");
-        display.value += "pi";
-    }
-
-    function e() {
-        let display = document.getElementById("display");
-        display.value += "e";
-    }
-
-    function power() {
-        let display = document.getElementById("display");
-        display.value += "^(";
-    }
-</script>	
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
 </head>
 <body>
-	<h1>
-		Scientific Calculator</h1>
-	<form>
-		<table>
-			<tr>
-				<td colspan="6">
-					<input id="display" type="text">
-				</td>
-			</tr>
-			<tr>
-				<td><input type="button" value="1"
-						onclick="display.value += '1'"></td>
-				<td><input type="button" value="2"
-						onclick="display.value += '2'"></td>
-				<td><input type="button" value="3"
-						onclick="display.value += '3'"></td>
-				<td><input type="button" value="C"
-						onclick="display.value = ''"></td>
-				<td><input type="button" value="⌫"
-						onclick="backspace()"></td>
-				<td><input type="button" value="="
-						onclick="calculate()"></td>
-			</tr>
-			<tr>
-				<td><input type="button" value="4"
-						onclick="display.value += '4'"></td>
-				<td><input type="button" value="5"
-						onclick="display.value += '5'"></td>
-				<td><input type="button" value="6"
-						onclick="display.value += '6'"></td>
-				<td><input type="button" value="-"
-						onclick="display.value += '-'"></td>
-				<td><input type="button" value="%"
-						onclick="display.value += '%'"></td>
-				<td><input type="button" value="cos("
-						onclick="display.value += 'cos('"></td>
-			</tr>
-			<tr>
-				<td><input type="button" value="7"
-						onclick="display.value += '7'"></td>
-				<td><input type="button" value="8"
-						onclick="display.value += '8'"></td>
-				<td><input type="button" value="9"
-						onclick="display.value += '9'"></td>
-				<td><input type="button" value="x"
-						onclick="display.value += '*'"></td>
-				<td><input type="button" value="!"
-						onclick="display.value += '!'"></td>
-				<td><input type="button" value="sin("
-						onclick="display.value += 'sin('"></td>
-			</tr>
-			<tr>
-				<td><input type="button" value="."
-						onclick="display.value += '.'"></td>
-				<td><input type="button" value="0"
-						onclick="display.value += '0'"></td>
-				<td><input type="button" value=","
-						onclick="display.value += ','"></td>
-				<td><input type="button" value="+"
-						onclick="display.value += '+'"></td>
-				<td><input type="button" value="÷"
-						onclick="display.value += '/'"></td>
-				<td><input type="button" value="tan("
-						onclick="display.value += 'tan('"></td>
-			</tr>
-			<tr>
-				<td><input type="button" value="E"
-						onclick="e()"></td>
-				<td><input type="button" value="π"
-						onclick="pi()"></td>
-				<td><input type="button" value="^"
-						onclick="power()"></td>
-				<td><input type="button" value="("
-						onclick="display.value += '('"></td>
-				<td><input type="button" value=")"
-						onclick="display.value += ')'"></td>
-				<td><input type="button" value="log("
-						onclick="base10Log()"></td>
-			</tr>
-			<tr>
-				<td><input type="button" value="sqrt("
-						onclick="squareRoot()"></td>
-				<td><input type="button" value="ln2"
-						onclick="display.value += Math.LN2"></td>
-				<td><input type="button" value="log10("
-						onclick="base10Log()"></td>
-				<td><input type="button" value="l2e"
-						onclick="display.value += Math.LOG2E"></td>
-				<td><input type="button" value="l10e"
-						onclick="display.value += Math.LOG10E"></td>
-				<td><input type="button" value="exp("
-						onclick="display.value += 'exp('"></td>
-			</tr>
-		</table>
-	</form>
+
+    <h1>You Made it!</h1>
+    <h2>Now supports searching + games 🎉</h2>
+
+    <input type="text" id="urlInput" placeholder="Start With https://" onkeydown="handleKeyPress(event)" />
+    <button onclick="openEmbed()">Open Site</button>
+
+    <h2>Made by: you might know me but if not then you dont need to know</h2>
+
+    <script>
+        function openEmbed() {
+            let url = document.getElementById("urlInput").value.trim();
+
+            // Auto-fix missing protocol
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                url = "https://" + url;
+            }
+
+            // Open new blank tab
+            let win = window.open("about:blank", "_blank");
+
+            // Set tab title
+            win.document.title = "Scientific Calculator";
+
+            // Make page full screen
+            win.document.body.style.margin = "0";
+            win.document.body.style.height = "100vh";
+            win.document.body.style.background = "black";
+
+            // Create iframe
+            let iframe = win.document.createElement("iframe");
+            iframe.style.border = "none";
+            iframe.style.width = "100%";
+            iframe.style.height = "100%";
+            iframe.allow = "fullscreen";
+            iframe.referrerPolicy = "no-referrer";
+
+            iframe.src = url;
+            win.document.body.appendChild(iframe);
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                openEmbed();
+            }
+        }
+    </script>
+
 </body>
 </html>
