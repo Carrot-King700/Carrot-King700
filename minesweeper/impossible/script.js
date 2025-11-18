@@ -1,10 +1,10 @@
 let g
 function setup() {
     g = {}
-    g.width = 15
-    g.height = 15
+    g.width = 100
+    g.height = 100
     g.sq = 25
-    g.nBombs = 100
+    g.nBombs = 500
     g.marked = 0
     g.dead = false
     g.startTime = millis()
