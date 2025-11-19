@@ -10,6 +10,11 @@ h1 {
   font-size: 2em;
 }
 
+h2 {
+  color: red;
+  font-size: 1.5em;
+}
+
 .tab-buttons {
     color: white;
     text-decoration: none;
