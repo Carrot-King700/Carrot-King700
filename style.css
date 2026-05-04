@@ -154,4 +154,22 @@
     padding: 8px;
     margin: 12px;
   }
+
+.tab-buttons-other {
+    color: white;
+    text-decoration: none;
+    font-size: 30px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: grey;
+  }
+  
+  .tab-buttons-other:hover {
+    color: black;
+    text-decoration: underline;
+    font-size: 30px;
+    background-color: white;
+    padding: 8px;
+    margin: 12px;
+  }
   
