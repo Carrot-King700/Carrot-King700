@@ -1,22 +1,36 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
-    <title>Scientific Calculator</title>
-    <link href="style.css" rel="stylesheet" type="text/css" />
-  </head>
-  <body>
-      <a href="red/" class="tab-buttons-red">Red</a>
-      <a href="orange/" class="tab-buttons-orange">Orange</a>
-      <a href="yellow/" class="tab-buttons-yellow">Yellow</a>
-      <a href="green/" class="tab-buttons-green">Green</a>
-      <a href="light-blue/" class="tab-buttons-light-blue">Light Blue</a>
-      <a href="dark-blue/" class="tab-buttons-dark-blue">Dark Blue</a>
-      <a href="purple/" class="tab-buttons-purple">Purple</a>
-      <a href="testing/" class="tab-buttons-other">TEST MODE!</a>
-      <a href="https://google.com" class="tab-buttons-other">Google</a>
-      <a href="https://vscode.dev" class="tab-buttons-other">VS Code</a>
-      <a href="https://github.com" class="tab-buttons-other">Github</a>
-  </body>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Scientific Calculator</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+  <a href="red/" class="tab-buttons-red">Red</a>
+  <a href="orange/" class="tab-buttons-orange">Orange</a>
+  <a href="yellow/" class="tab-buttons-yellow">Yellow</a>
+  <a href="green/" class="tab-buttons-green">Green</a>
+  <a href="light-blue/" class="tab-buttons-light-blue">Light Blue</a>
+  <a href="dark-blue/" class="tab-buttons-dark-blue">Dark Blue</a>
+  <a href="purple/" class="tab-buttons-purple">Purple</a>
+  <button id="tab-buttons-other" type="button" onclick="testFunction()">TEST MODE!</button>
+  <a href="https://google.com" class="tab-buttons-other">Google</a>
+  <a href="https://vscode.dev" class="tab-buttons-other">VS Code</a>
+  <a href="https://github.com" class="tab-buttons-other">Github</a>
+  <script>
+      function testFunction() {
+        let text = "Confirm to enter a\n land of testing";
+      if (confirm(text) == true) {
+        window.location.href = "testing/";
+  } else {
+    window.location.href = "../";
+  }
+      document.getElementById("demo").innerHTML = text;
+}
+  </script>
+</body>
+
 </html>
